@@ -10,6 +10,8 @@
             --secondary-color: #4ECDC4;
             --background-color: #f8f9fa;
             --text-color: #343a40;
+            --input-height: 48px;
+            --border-radius: 12px;
         }
         * {
             box-sizing: border-box;
@@ -24,21 +26,28 @@
         }
         .container {
             max-width: 100%;
-            padding: 20px;
+            padding: 16px;
             margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .card {
             background: white;
-            border-radius: 16px;
+            border-radius: var(--border-radius);
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            position: relative;
+            z-index: 0;
+            flex: 1;
         }
         h1 {
             color: var(--primary-color);
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             margin-bottom: 20px;
+            line-height: 1.4;
         }
         .input-group {
             margin-bottom: 20px;
@@ -53,48 +62,139 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            position: relative;
+            z-index: 2;
         }
         input, select {
             flex: 1;
-            padding: 12px;
+            padding: 12px 16px;
             border: 2px solid #e9ecef;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             font-size: 16px;
             transition: border-color 0.3s;
+            height: var(--input-height);
+            -webkit-appearance: none;
+            appearance: none;
         }
         input:focus, select:focus {
             outline: none;
             border-color: var(--secondary-color);
         }
         .unit-label {
-            padding: 12px;
+            padding: 12px 16px;
             background: #e9ecef;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             font-size: 14px;
             white-space: nowrap;
+            height: var(--input-height);
+            display: flex;
+            align-items: center;
         }
         button {
             width: 100%;
-            padding: 15px;
+            padding: 0;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s, background-color 0.3s;
+            height: var(--input-height);
+            -webkit-tap-highlight-color: transparent;
         }
         button:active {
             transform: scale(0.98);
         }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: var(--border-radius);
+            width: 92%;
+            max-width: 500px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 1001;
+            animation: slideIn 0.3s ease-out;
+            padding-bottom: 60px;
+        }
+        .modal-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 20px 20px 0;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            z-index: 2;
+        }
+        .modal-content {
+            padding: 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex: 1;
+        }
+        .modal-close {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: none;
+            outline: none;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            cursor: pointer;
+            color: var(--text-color);
+            width: 120px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            transition: all 0.2s;
+            z-index: 1002;
+            opacity: 0.8;
+        }
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
         .result {
             display: none;
-            margin-top: 20px;
-            animation: fadeIn 0.5s ease-out;
         }
         .result.show {
             display: block;
+        }
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
         }
         .comparison-item {
             display: flex;
@@ -138,11 +238,12 @@
         .tag {
             background: var(--secondary-color);
             color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
             font-size: 14px;
             cursor: pointer;
             transition: transform 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         .tag:hover {
             transform: scale(1.05);
@@ -171,11 +272,12 @@
         }
         .food-item {
             background: #f0f4ff;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
         .food-item:hover {
             background: #e0e7ff;
@@ -184,6 +286,57 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+            .card {
+                padding: 12px;
+            }
+            h1 {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+            }
+            .building-comparison {
+                margin-top: 10px;
+                padding: 8px;
+            }
+            .comparison-item {
+                padding: 6px;
+                font-size: 13px;
+                margin: 8px 0;
+            }
+            .modal {
+                width: 92%;
+                max-height: 85vh;
+                margin: 0 auto;
+            }
+            .modal-header {
+                padding: 12px 12px 0;
+            }
+            .modal-content {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+            .modal-close {
+                width: 90px;
+                height: 32px;
+                font-size: 13px;
+                bottom: 15px;
+            }
+            .food-categories {
+                gap: 10px;
+            }
+            .tag {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+            .food-item {
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
+        }
+
         @media (min-width: 768px) {
             .container {
                 max-width: 600px;
@@ -194,7 +347,7 @@
 <body>
     <div class="container">
         <div class="card">
-            <h1>🔥 卡路里消耗计算器</h1>
+            <h1>😱 天啦！吃完这个居然需要如此大的运动量</h1>
             <div class="input-group">
                 <label for="calories">食物热量：</label>
                 <div class="input-wrapper">
@@ -248,7 +401,7 @@
                     <span class="unit-label">千克(kg)</span>
                 </div>
             </div>
-            <button onclick="calculateStairs()">开始计算 👆</button>
+            <button onclick="calculateStairs()">劝我别吃 🙅‍♂️</button>
             <div id="result" class="result"></div>
         </div>
     </div>
@@ -256,6 +409,7 @@
     <script>
         function setCalories(value) {
             document.getElementById('calories').value = value;
+            document.getElementById('unit').value = 'cal';
         }
 
         function calculateStairs() {
@@ -279,9 +433,12 @@
                 caloriesInKcal = calories;
             }
 
-            // 根据经验公式：每千卡路里大约可以爬10米高度
-            const heightPerKcal = 10;
-            const actualHeight = Math.round(caloriesInKcal * heightPerKcal / 20);
+            // 重力势能公式：mgh = Q，其中m是体重(kg)，g是重力加速度(9.8m/s²)，h是高度(m)，Q是热量(焦耳)
+            // 1大卡 = 4184焦耳
+            // 考虑人体机械效率20%
+            const g = 9.8; // 重力加速度
+            const efficiency = 0.2; // 人体机械效率20%
+            const actualHeight = Math.round((caloriesInKcal * 4184* efficiency) / (weight * g ));
 
             // 计算相当于多少层楼（假设每层3米）
             const floorsActual = Math.max(1, Math.round(actualHeight / 3));
@@ -289,30 +446,110 @@
             // 计算运动时间（假设平均速度为60步/分钟）
             const timeInMinutes = Math.round((floorsActual * 20) / 60);
 
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `
-                <div style="font-size: 1.2em; margin-bottom: 15px;">
-                    消耗 ${calories} ${unit === 'cal' ? '卡路里' : '千焦'} 需要：
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal';
+            
+            const buildingHeights = {
+                '东方明珠': 468,
+                '上海中心': 632,
+                '哈利法塔': 828
+            };
+            
+            // 根据实际高度选择最合适的参考建筑
+            let closestBuilding = '东方明珠';
+            let percentage = 0;
+            
+            // 如果高度超过东方明珠，选择上海中心；如果超过上海中心，选择哈利法塔
+            if (actualHeight > buildingHeights['东方明珠']) {
+                closestBuilding = '上海中心';
+                if (actualHeight > buildingHeights['上海中心']) {
+                    closestBuilding = '哈利法塔';
+                }
+            }
+            
+            // 计算相对于选定建筑的百分比
+            percentage = Math.round((actualHeight / buildingHeights[closestBuilding]) * 100);
+            
+            let shockingMessage = '';
+            if (percentage > 100) {
+                shockingMessage = `💪 需要付出相当于爬${closestBuilding}${percentage}%高度的努力！`;
+            } else {
+                shockingMessage = percentage > 50 
+                    ? `😱 天啊！这相当于徒步爬上${closestBuilding}的${percentage}%！`
+                    : `💪 需要付出相当于爬${closestBuilding}${percentage}%高度的努力！`;
+            }
+            
+            modalContent.innerHTML = `
+                <div class="modal-header">
+                    <div style="font-size: 1.4em; text-align: center; color: var(--primary-color);">
+                        ${shockingMessage}
+                    </div>
                 </div>
+                <div class="modal-content">
+                <div class="modal-close">关闭</div>
                 <div class="comparison-item">
                     <span class="comparison-icon">🏢</span>
-                    <span>爬 <strong style="color: var(--primary-color);">${floorsActual}</strong> 层楼</span>
+                    <span>需要爬 <strong style="color: var(--primary-color);">${floorsActual}</strong> 层楼</span>
                 </div>
                 <div class="comparison-item">
                     <span class="comparison-icon">⏱️</span>
-                    <span>大约需要 <strong style="color: var(--primary-color);">${timeInMinutes}</strong> 分钟</span>
+                    <span>持续运动 <strong style="color: var(--primary-color);">${timeInMinutes}</strong> 分钟</span>
                 </div>
                 <div class="comparison-item">
                     <span class="comparison-icon">📏</span>
-                    <span>总高度约 <strong style="color: var(--primary-color);">${actualHeight}</strong> 米</span>
+                    <span>总高度达到惊人的 <strong style="color: var(--primary-color);">${actualHeight}</strong> 米</span>
                 </div>
-                <div class="building-comparison">
-                <div style="margin-bottom: 10px;">🏗️ 高度参考：</div>
-                <div class="building-item">• 东方明珠：468米</div>
-                <div class="building-item">• 上海中心：632米</div>
-                <div class="building-item">• 哈利法塔：828米</div>
-            </div>
+                <div class="building-comparison" style="text-align: center; margin-bottom: 40px;">
+                    <div style="font-size: 1.2em; margin: 15px 0;">🏗️ 高度对比参考</div>
+                    <div style="display: flex; align-items: flex-end; justify-content: center; height: 200px; margin: 20px 0; padding: 0 20px;">
+                        <div style="width: 60px; height: ${Math.min((actualHeight/828)*200, 200)}px; background: linear-gradient(to top, var(--primary-color), #ff8f8f); margin: 0 15px; position: relative; border-radius: 6px 6px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="position: absolute; bottom: -30px; text-align: center; width: 100%; font-size: 12px;">您需要爬升<br><strong>${actualHeight}米</strong></div>
+
+                        </div>
+                        <div style="width: 60px; height: ${(468/828)*200}px; background: linear-gradient(to top, var(--secondary-color), #7fe7e0); margin: 0 15px; position: relative; border-radius: 6px 6px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="position: absolute; bottom: -30px; text-align: center; width: 100%; font-size: 12px;">东方明珠<br><strong>468米</strong></div>
+                        </div>
+                        <div style="width: 60px; height: ${(632/828)*200}px; background: linear-gradient(to top, var(--secondary-color), #7fe7e0); margin: 0 15px; position: relative; border-radius: 6px 6px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="position: absolute; bottom: -30px; text-align: center; width: 100%; font-size: 12px;">上海中心<br><strong>632米</strong></div>
+                        </div>
+                        <div style="width: 60px; height: 200px; background: linear-gradient(to top, var(--secondary-color), #7fe7e0); margin: 0 15px; position: relative; border-radius: 6px 6px 0 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                            <div style="position: absolute; bottom: -30px; text-align: center; width: 100%; font-size: 12px;">哈利法塔<br><strong>828米</strong></div>
+                        </div>
+                    </div>
+                    <div style="color: #666; margin-top: 40px; font-size: 0.9em;">
+                        💡 震惊吧！为了消耗这些热量，您需要付出如此惊人的运动量...<br>
+                        现在，您还确定要吃这个吗？不如来点水果？🍎
+                    </div>
+                </div>
             `;
+            
+            // 移除已存在的弹窗
+            const existingModal = document.querySelector('.modal-overlay');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+            modalOverlay.style.display = 'block';
+            
+            // 点击关闭按钮或空白区域关闭弹窗
+            const closeModal = () => {
+                modalOverlay.style.display = 'none';
+                modalOverlay.remove();
+            };
+            
+            modalOverlay.querySelector('.modal-close').addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            modalContent.addEventListener('click', (e) => e.stopPropagation());
+            
+            const resultDiv = document.getElementById('result');
             resultDiv.classList.add('show');
         }
     </script>

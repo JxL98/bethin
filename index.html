@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>卡路里消耗计算器</title>
+    <style>
+        :root {
+            --primary-color: #FF6B6B;
+            --secondary-color: #4ECDC4;
+            --background-color: #f8f9fa;
+            --text-color: #343a40;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input, select {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        .unit-label {
+            padding: 12px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .result {
+            display: none;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .result.show {
+            display: block;
+        }
+        .comparison-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .comparison-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+        .building-comparison {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .building-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 0.9em;
+        }
+        .food-reference {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .quick-reference {
+            margin-top: 10px;
+        }
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .tag {
+            background: var(--secondary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .tag:hover {
+            transform: scale(1.05);
+        }
+        .food-list {
+            margin-top: 10px;
+        }
+        .food-list summary {
+            cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        .food-categories {
+            margin-top: 15px;
+            display: grid;
+            gap: 20px;
+        }
+        .category h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+        .food-items {
+            display: grid;
+            gap: 8px;
+        }
+        .food-item {
+            background: #f0f4ff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .food-item:hover {
+            background: #e0e7ff;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔥 卡路里消耗计算器</h1>
+            <div class="input-group">
+                <label for="calories">食物热量：</label>
+                <div class="input-wrapper">
+                    <input type="number" id="calories" placeholder="例如：500">
+                    <select id="unit">
+                        <option value="cal">卡路里</option>
+                        <option value="kj">千焦(kJ)</option>
+                    </select>
+                </div>
+                <div class="quick-reference">
+                    <div class="quick-tags">
+                        <span class="tag" onclick="setCalories(300)">🍔 汉堡 300大卡</span>
+                        <span class="tag" onclick="setCalories(500)">🍜 拉面 500大卡</span>
+                        <span class="tag" onclick="setCalories(266)">🍕 披萨 266大卡/片</span>
+                    </div>
+                    <details class="food-list">
+                        <summary>查看更多食物热量参考 👇</summary>
+                        <div class="food-categories">
+                            <div class="category">
+                                <h3>主食类 🍚</h3>
+                                <div class="food-items">
+                                    <span class="food-item" onclick="setCalories(206)">米饭(1碗) 206大卡</span>
+                                    <span class="food-item" onclick="setCalories(223)">馒头(1个) 223大卡</span>
+                                    <span class="food-item" onclick="setCalories(110)">面包片 110大卡</span>
+                                </div>
+                            </div>
+                            <div class="category">
+                                <h3>零食类 🍪</h3>
+                                <div class="food-items">
+                                    <span class="food-item" onclick="setCalories(120)">薯片(28g) 120大卡</span>
+                                    <span class="food-item" onclick="setCalories(150)">巧克力(30g) 150大卡</span>
+                                    <span class="food-item" onclick="setCalories(85)">苹果(中) 85大卡</span>
+                                </div>
+                            </div>
+                            <div class="category">
+                                <h3>饮料类 🥤</h3>
+                                <div class="food-items">
+                                    <span class="food-item" onclick="setCalories(138)">可乐(330ml) 138大卡</span>
+                                    <span class="food-item" onclick="setCalories(95)">果汁(250ml) 95大卡</span>
+                                    <span class="food-item" onclick="setCalories(180)">奶茶(500ml) 180大卡</span>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="weight">您的体重：</label>
+                <div class="input-wrapper">
+                    <input type="number" id="weight" placeholder="例如：70" value="70">
+                    <span class="unit-label">千克(kg)</span>
+                </div>
+            </div>
+            <button onclick="calculateStairs()">开始计算 👆</button>
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        function setCalories(value) {
+            document.getElementById('calories').value = value;
+        }
+
+        function calculateStairs() {
+            const calories = parseFloat(document.getElementById('calories').value);
+            const unit = document.getElementById('unit').value;
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (isNaN(calories) || calories <= 0) {
+                alert('请输入有效的热量数值');
+                return;
+            }
+            if (isNaN(weight) || weight <= 0) {
+                alert('请输入有效的体重数值');
+                return;
+            }
+
+            let caloriesInKcal;
+            if (unit === 'kj') {
+                caloriesInKcal = calories / 4.184;
+            } else {
+                caloriesInKcal = calories;
+            }
+
+            // 根据经验公式：每千卡路里大约可以爬10米高度
+            const heightPerKcal = 10;
+            const actualHeight = Math.round(caloriesInKcal * heightPerKcal / 20);
+
+            // 计算相当于多少层楼（假设每层3米）
+            const floorsActual = Math.max(1, Math.round(actualHeight / 3));
+            
+            // 计算运动时间（假设平均速度为60步/分钟）
+            const timeInMinutes = Math.round((floorsActual * 20) / 60);
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div style="font-size: 1.2em; margin-bottom: 15px;">
+                    消耗 ${calories} ${unit === 'cal' ? '卡路里' : '千焦'} 需要：
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">🏢</span>
+                    <span>爬 <strong style="color: var(--primary-color);">${floorsActual}</strong> 层楼</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">⏱️</span>
+                    <span>大约需要 <strong style="color: var(--primary-color);">${timeInMinutes}</strong> 分钟</span>
+                </div>
+                <div class="comparison-item">
+                    <span class="comparison-icon">📏</span>
+                    <span>总高度约 <strong style="color: var(--primary-color);">${actualHeight}</strong> 米</span>
+                </div>
+                <div class="building-comparison">
+                <div style="margin-bottom: 10px;">🏗️ 高度参考：</div>
+                <div class="building-item">• 东方明珠：468米</div>
+                <div class="building-item">• 上海中心：632米</div>
+                <div class="building-item">• 哈利法塔：828米</div>
+            </div>
+            `;
+            resultDiv.classList.add('show');
+        }
+    </script>
+</body>
+</html>
